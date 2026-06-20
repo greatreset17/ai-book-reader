@@ -1,6 +1,6 @@
 """
 gemini_client.py - Gemini API クライアント
-プライマリ: gemini-2.5-flash / フォールバック: gemini-2.0-flash
+プライマリ: gemini-3.5-flash / フォールバック: gemini-2.5-flash
 """
 import logging
 from typing import Optional
@@ -17,8 +17,8 @@ from .prompts import (
 
 logger = logging.getLogger(__name__)
 
-PRIMARY_MODEL = "gemini-2.5-flash"
-FALLBACK_MODEL = "gemini-2.0-flash"
+PRIMARY_MODEL = "gemini-3.5-flash"
+FALLBACK_MODEL = "gemini-2.5-flash"
 
 
 class GeminiClient:
