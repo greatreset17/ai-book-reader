@@ -94,8 +94,7 @@ def inject_css(is_dark: bool):
     [data-baseweb="select"] > div,
     [data-baseweb="input"] > div,
     .stTextInput > div > div,
-    .stSelectbox > div > div,
-    .stChatInput > div {{
+    .stSelectbox > div > div {{
         background-color: var(--bg2) !important;
         color: var(--text) !important;
         border-color: var(--card-border) !important;
@@ -106,9 +105,23 @@ def inject_css(is_dark: bool):
         color: var(--text-sub) !important;
     }}
     [data-baseweb="select"] span,
-    [data-baseweb="input"] input,
-    .stChatInput textarea {{
+    [data-baseweb="input"] input {{
         color: var(--text) !important;
+    }}
+
+    /* Chat Input */
+    [data-testid="stChatInput"],
+    [data-testid="stChatInput"] > div,
+    [data-testid="stChatInput"] textarea,
+    .stChatInput > div,
+    .stChatInput textarea {{
+        background-color: var(--bg2) !important;
+        color: var(--text) !important;
+        -webkit-text-fill-color: var(--text) !important;
+        border-color: var(--card-border) !important;
+    }}
+    [data-testid="stChatInput"] svg {{
+        fill: var(--text) !important;
     }}
 
     /* Buttons */
@@ -458,10 +471,19 @@ def init_state():
 init_state()
 
 # ---------------------------------------------------------------------------
-# Initialize Gemini client from .env
+# Initialize Gemini client from .env or st.secrets
 # ---------------------------------------------------------------------------
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
+
+# 1. Check OS environment variables
 _api_key = os.getenv("GEMINI_API_KEY", "")
+# 2. Check Streamlit Secrets if not found
+if not _api_key:
+    try:
+        _api_key = st.secrets.get("GEMINI_API_KEY", "")
+    except Exception:
+        pass
+
 if _api_key and st.session_state.gemini_client is None:
     try:
         st.session_state.gemini_client = GeminiClient(_api_key)
@@ -487,6 +509,17 @@ with st.sidebar:
 inject_css(st.session_state.dark_mode)
 
 with st.sidebar:
+
+    # Fallback API Key Input if not set in secrets
+    if st.session_state.gemini_client is None:
+        user_api_key = st.text_input("🔑 Gemini API Key", type="password", help="Settingsから保存できない場合はここに入力してください。")
+        if user_api_key:
+            try:
+                st.session_state.gemini_client = GeminiClient(user_api_key)
+                st.rerun()
+            except Exception as e:
+                st.error(f"APIキーエラー: {e}")
+        st.divider()
 
     # File upload
     uploaded_file = st.file_uploader(
