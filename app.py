@@ -197,8 +197,18 @@ def inject_css(is_dark: bool):
     }}
 
     /* Code blocks */
-    .stCodeBlock, code {{
+    [data-testid="stCodeBlock"],
+    [data-testid="stCodeBlock"] div,
+    [data-testid="stCodeBlock"] pre,
+    [data-testid="stCodeBlock"] code,
+    code {{
         background-color: var(--bg2) !important;
+        color: var(--text) !important;
+        text-shadow: none !important;
+    }}
+    [data-testid="stCodeBlock"] span {{
+        color: var(--text) !important;
+        text-shadow: none !important;
     }}
 
     /* ===== Custom classes ===== */
